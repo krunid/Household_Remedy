@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แฟนพันธุ์แท้ยาสามัญประจำบ้าน</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-color: #e8f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        #app {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #game-board {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        #game-board div {
+            width: 100px;
+            height: 100px;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9em;
+            text-align: center;
+            padding: 5px;
+            border-radius: 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        #game-board div:hover {
+            background-color: #388E3C;
+            transform: scale(1.1);
+        }
+
+        #hint-area {
+            margin: 20px 0;
+            font-size: 1em;
+            font-weight: bold;
+            word-wrap: break-word;
+            color: #333;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 12px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #388E3C;
+            transform: scale(1.05);
+        }
+
+        #result {
+            margin: 20px 0;
+            font-size: 1.5em;
+            color: #4CAF50;
+        }
+
+        #guess-input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #4CAF50;
+            border-radius: 12px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #guess-input:focus {
+            border-color: #388E3C;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        #guess-input::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        .disclaimer {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>แฟนพันธุ์แท้ยาสามัญประจำบ้าน</h1>
+        <div id="game-board">
+            <!-- ป้ายคำใบ้จะอยู่ที่นี่ -->
+        </div>
+        <button id="reveal-btn">เปิดป้าย</button>
+        <div id="hint-area"></div>
+        <input type="text" id="guess-input" placeholder="พิมพ์ชื่อยาที่คุณคิดว่าใช่">
+        <button id="submit-btn">ส่งคำตอบ</button>
+        <div id="result"></div>
+        <div class="disclaimer">
+            หมายเหตุ: เกมนี้มีไว้เพื่อการศึกษาเท่านั้น กรุณาปรึกษาแพทย์หรือเภสัชกรก่อนใช้ยาเสมอ
+        </div>
+    </div>
+    <script>
+        const medicines = [
+            {
+                name: "พาราเซตามอล",
+                hints: [
+                    "ใช้ลดไข้และบรรเทาปวด",
+                    "ยาเม็ดสีขาว ขนาด 500 มก.",
+                    "ไม่ควรทานเกิน 8 เม็ดต่อวัน",
+                    "ควรระวังในผู้ป่วยโรคตับ",
+                    "มักใช้เป็นยาตัวแรกเมื่อมีไข้"
+                ]
+            },
+            {
+                name: "คาลาไมน์",
+                hints: [
+                    "ใช้ทาภายนอกแก้คัน",
+                    "มีลักษณะเป็นโลชั่นสีชมพู",
+                    "นิยมใช้รักษาผดผื่นคัน",
+                    "มีสรรพคุณระงับอาการแพ้",
+                    "ห้ามทาบริเวณที่มีแผลเปิด"
+                ]
+            },
+            {
+                name: "เบตาดีน",
+                hints: [
+                    "ใช้ฆ่าเชื้อโรค",
+                    "มีสีน้ำตาลแดง",
+                    "ใช้ทำความสะอาดบาดแผล",
+                    "มีไอโอดีนเป็นส่วนประกอบ",
+                    "อาจทำให้เสื้อผ้าเปื้อนติดถาวร"
+                ]
+            },
+            {
+                name: "น้ำเกลือล้างแผล",
+                hints: [
+                    "ใช้ทำความสะอาดบาดแผล",
+                    "เป็นสารละลายใส ไม่มีสี",
+                    "มีความเข้มข้น 0.9%",
+                    "ใช้ล้างตาได้",
+                    "ไม่แสบแผล"
+                ]
+            },
+            {
+                name: "ทิงเจอร์ไอโอดีน",
+                hints: [
+                    "ใช้ฆ่าเชื้อโรค",
+                    "มีสีน้ำตาลเข้ม",
+                    "ระคายเคืองผิวหนังได้",
+                    "ใช้ทาก่อนฉีดยา",
+                    "ห้ามรับประทาน"
+                ]
+            },
+            {
+                name: "ยาธาตุน้ำแดง",
+                hints: [
+                    "ใช้รักษาอาการท้องอืด ท้องเฟ้อ",
+                    "มีสีแดง",
+                    "มีรสหวาน",
+                    "มีสมุนไพรเป็นส่วนประกอบ",
+                    "นิยมใช้หลังอาหาร"
+                ]
+            },
+            {
+                name: "ยาแก้แพ้",
+                hints: [
+                    "ใช้บรรเทาอาการแพ้",
+                    "อาจทำให้ง่วงนอน",
+                    "ไม่ควรดื่มแอลกอฮอล์",
+                    "ห้ามใช้ในเด็กอายุต่ำกว่า 6 ปี",
+                    "ระวังการขับขี่ยานพาหนะ"
+                ]
+            },
+            {
+                name: "ผงน้ำตาลเกลือแร่",
+                hints: [
+                    "ใช้รักษาอาการท้องเสีย",
+                    "ละลายน้ำดื่ม",
+                    "ป้องกันการขาดน้ำ",
+                    "มีรสเค็มอ่อนๆ",
+                    "ควรดื่มให้หมดภายใน 24 ชั่วโมง"
+                ]
+            },
+            {
+                name: "วาสลีน",
+                hints: [
+                    "ใช้ทาผิวแห้ง แตก",
+                    "มีลักษณะเป็นขี้ผึ้ง",
+                    "ไม่มีสี โปร่งใส",
+                    "ใช้ปกป้องผิวจากความชื้น",
+                    "ไม่มีส่วนผสมของน้ำ"
+                ]
+            },
+            {
+                name: "แอลกอฮอล์",
+                hints: [
+                    "ใช้ฆ่าเชื้อโรค",
+                    "ระเหยง่าย",
+                    "ห้ามใช้กับแผลเปิด",
+                    "เก็บให้ห่างจากเปลวไฟ",
+                    "มีความเข้มข้น 70%"
+                ]
+            }
+        ];
+
+        let currentMedicine = null;
+        let hintIndex = 0;
+        let revealedHints = [];
+
+        function startGame() {
+            const randomIndex = Math.floor(Math.random() * medicines.length);
+            currentMedicine = medicines[randomIndex];
+            hintIndex = 0;
+            revealedHints = [];
+            document.getElementById('hint-area').textContent = '';
+            document.getElementById('result').textContent = '';
+            document.getElementById('game-board').innerHTML = '';
+            document.getElementById('guess-input').value = '';
+            
+            for (let i = 0; i < currentMedicine.hints.length; i++) {
+                const tile = document.createElement('div');
+                tile.textContent = '?';
+                tile.dataset.index = i;
+                document.getElementById('game-board').appendChild(tile);
+            }
+        }
+
+        document.getElementById('reveal-btn').addEventListener('click', () => {
+            if (hintIndex < currentMedicine.hints.length) {
+                const tiles = document.querySelectorAll('#game-board div');
+                tiles[hintIndex].textContent = currentMedicine.hints[hintIndex];
+                revealedHints.push(currentMedicine.hints[hintIndex]);
+                document.getElementById('hint-area').innerHTML = revealedHints.map(
+                    (hint, index) => `<div>คำใบ้ ${index + 1}: ${hint}</div>`
+                ).join('');
+                hintIndex++;
+            } else {
+                document.getElementById('hint-area').textContent = "หมดคำใบ้แล้ว!";
+            }
+        });
+
+        document.getElementById('submit-btn').addEventListener('click', () => {
+            const guess = document.getElementById('guess-input').value.trim();
+            if (guess === currentMedicine.name) {
+                document.getElementById('result').textContent = "ถูกต้อง! คุณเก่งมาก!";
+                setTimeout(() => {
+                    if (confirm("ต้องการเล่นอีกครั้งไหม?")) {
+                        startGame();
+                    }
+                }, 1500);
+            } else {
+                document.getElementById('result').textContent = "ผิด! ลองอีกครั้ง";
+            }
+        });
+
+        document.getElementById('guess-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('submit-btn').click();
+            }
+        });
+
+        startGame();
+    </script>
+</body>
+</html>
