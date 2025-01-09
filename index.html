@@ -3,487 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เกมทายยาสามัญประจำบ้าน</title>
+    <title>แฟนพันธุ์แท้ยาสามัญประจำบ้าน</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'Arial', sans-serif;
+            text-align: center;
             background-color: #e8f4f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            line-height: 1.6;
             color: #333;
+            margin: 0;
+            padding: 0;
         }
 
         #app {
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 500px;
+            max-width: 800px;
+            margin: 20px auto;
             padding: 20px;
-            text-align: center;
-        }
-
-        h1 {
-            color: #4CAF50;
-            margin-bottom: 20px;
-        }
-
-        #timer {
-            font-size: 1.5em;
-            color: #4CAF50;
-            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         #game-board {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            margin: 20px 0;
         }
 
-        .hint-tile {
+        #game-board div {
             width: 100px;
             height: 100px;
+            margin: 5px;
             background-color: #4CAF50;
             color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 10px;
             font-size: 0.9em;
+            text-align: center;
+            padding: 5px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: transform 0.3s ease;
+            user-select: none;
+            transition: transform 0.2s ease, background-color 0.2s ease;
         }
 
-        .hint-tile:hover {
-            transform: scale(1.05);
+        #game-board div:hover {
+            background-color: #388E3C;
+            transform: scale(1.1);
         }
 
         #hint-area {
-            margin-bottom: 20px;
+            margin: 20px 0;
+            font-size: 1em;
             font-weight: bold;
+            word-wrap: break-word;
+            color: #333;
         }
 
-        #choices-area {
-            display: flex;
-            flex-direction: column;
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 12px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #388E3C;
+            transform: scale(1.05);
+        }
+
+        #result {
+            margin: 20px 0;
+            font-size: 1.5em;
+            color: #4CAF50;
+        }
+
+        .choices-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
+            margin: 20px auto;
+            max-width: 600px;
         }
 
         .choice-btn {
+            padding: 15px;
+            margin: 5px;
             background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-size: 1em;
+            transition: all 0.3s ease;
         }
 
         .choice-btn:hover {
-            background-color: #45a049;
+            background-color: #388E3C;
             transform: scale(1.02);
-        }
-
-        .choice-btn.incorrect {
-            background-color: #f44336;
         }
 
         .choice-btn.correct {
             background-color: #4CAF50;
         }
 
-        #result {
-            margin-top: 20px;
-            font-size: 1.2em;
+        .choice-btn.wrong {
+            background-color: #f44336;
+        }
+
+        .timer {
+            font-size: 2em;
             font-weight: bold;
+            color: #4CAF50;
+            margin: 10px 0;
         }
 
         .disclaimer {
-            margin-top: 20px;
             font-size: 0.8em;
             color: #666;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+        }
+
+        .score {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4CAF50;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
     <div id="app">
-        <h1>เปิดป้ายทายยาสามัญประจำบ้าน</h1>
-        <div id="timer">เวลา: 60</div>
+        <h1>💊 แฟนพันธุ์แท้ยาสามัญประจำบ้าน 🩹</h1>
+        <div class="timer" id="timer">02:00</div>
+        <div class="score" id="score">คะแนน: 0</div>
         <div id="game-board">
-            <!-- Hint tiles will be generated here -->
+            <!-- ป้ายคำใบ้จะอยู่ที่นี่ -->
         </div>
+        <button id="reveal-btn">เปิดป้าย</button>
         <div id="hint-area"></div>
-        <div id="choices-area"></div>
+        <div class="choices-container" id="choices">
+            <!-- ตัวเลือกจะถูกเพิ่มที่นี่ -->
+        </div>
         <div id="result"></div>
         <div class="disclaimer">
             หมายเหตุ: เกมนี้มีไว้เพื่อการศึกษาเท่านั้น กรุณาปรึกษาแพทย์หรือเภสัชกรก่อนใช้ยาเสมอ
         </div>
     </div>
-
-    const medicines = [
-    {
-        name: "พาราเซตามอล",
-        hints: [
-            "ใช้ลดไข้และบรรเทาปวด",
-            "ยาเม็ดสีขาว ขนาด 500 มก.",
-            "ไม่ควรทานเกิน 8 เม็ดต่อวัน",
-            "ควรระวังในผู้ป่วยโรคตับ",
-            "มักใช้เป็นยาตัวแรกเมื่อมีไข้"
-        ],
-        category: "ยาแก้ปวดและลดไข้"
-    },
-    {
-        name: "คาลาไมน์",
-        hints: [
-            "ใช้ทาภายนอกแก้คัน",
-            "มีลักษณะเป็นโลชั่นสีชมพู",
-            "นิยมใช้รักษาผดผื่นคัน",
-            "มีสรรพคุณระงับอาการแพ้",
-            "ห้ามทาบริเวณที่มีแผลเปิด"
-        ],
-        category: "ยาทาภายนอก"
-    },
-    {
-        name: "เบตาดีน",
-        hints: [
-            "ใช้ฆ่าเชื้อโรค",
-            "มีสีน้ำตาลแดง",
-            "ใช้ทำความสะอาดบาดแผล",
-            "มีไอโอดีนเป็นส่วนประกอบ",
-            "อาจทำให้เสื้อผ้าเปื้อนติดถาวร"
-        ],
-        category: "ยาฆ่าเชื้อ"
-    },
-    {
-        name: "น้ำเกลือล้างแผล",
-        hints: [
-            "ใช้ทำความสะอาดบาดแผล",
-            "เป็นสารละลายใส ไม่มีสี",
-            "มีความเข้มข้น 0.9%",
-            "ใช้ล้างตาได้",
-            "ไม่แสบแผล"
-        ],
-        category: "สารละลายทางการแพทย์"
-    },
-    {
-        name: "ทิงเจอร์ไอโอดีน",
-        hints: [
-            "ใช้ฆ่าเชื้อโรค",
-            "มีสีน้ำตาลเข้ม",
-            "ระคายเคืองผิวหนังได้",
-            "ใช้ทาก่อนฉีดยา",
-            "ห้ามรับประทาน"
-        ],
-        category: "ยาฆ่าเชื้อ"
-    },
-    {
-        name: "ยาธาตุน้ำแดง",
-        hints: [
-            "ใช้รักษาอาการท้องอืด ท้องเฟ้อ",
-            "มีสีแดง",
-            "มีรสหวาน",
-            "มีสมุนไพรเป็นส่วนประกอบ",
-            "นิยมใช้หลังอาหาร"
-        ],
-        category: "ยาแก้ท้องอืด"
-    },
-    {
-        name: "ยาแก้แพ้",
-        hints: [
-            "ใช้บรรเทาอาการแพ้",
-            "อาจทำให้ง่วงนอน",
-            "ไม่ควรดื่มแอลกอฮอล์",
-            "ห้ามใช้ในเด็กอายุต่ำกว่า 6 ปี",
-            "ระวังการขับขี่ยานพาหนะ"
-        ],
-        category: "ยาระงับอาการแพ้"
-    },
-    {
-        name: "ผงน้ำตาลเกลือแร่",
-        hints: [
-            "ใช้รักษาอาการท้องเสีย",
-            "ละลายน้ำดื่ม",
-            "ป้องกันการขาดน้ำ",
-            "มีรสเค็มอ่อนๆ",
-            "ควรดื่มให้หมดภายใน 24 ชั่วโมง"
-        ],
-        category: "สารน้ำและเกลือแร่"
-    },
-    {
-        name: "วาสลีน",
-        hints: [
-            "ใช้ทาผิวแห้ง แตก",
-            "มีลักษณะเป็นขี้ผึ้ง",
-            "ไม่มีสี โปร่งใส",
-            "ใช้ปกป้องผิวจากความชื้น",
-            "ไม่มีส่วนผสมของน้ำ"
-        ],
-        category: "ยาทาภายนอก"
-    },
-    {
-        name: "แอลกอฮอล์",
-        hints: [
-            "ใช้ฆ่าเชื้อโรค",
-            "ระเหยง่าย",
-            "ห้ามใช้กับแผลเปิด",
-            "เก็บให้ห่างจากเปลวไฟ",
-            "มีความเข้มข้น 70%"
-        ],
-        category: "สารฆ่าเชื้อ"
-    }
-];
-
-// Optional: Function to get random medicines
-function getRandomMedicines(count = 4) {
-    const shuffled = medicines.sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
-}
-
-// Optional: Function to find similar medicines
-function findSimilarMedicines(medicine, count = 3) {
-    return medicines
-        .filter(med => 
-            med.name !== medicine.name && 
-            med.category === medicine.category
-        )
-        .sort(() => 0.5 - Math.random())
-        .slice(0, count);
-}
-
-export { medicines, getRandomMedicines, findSimilarMedicines };
     <script>
-        // Import medicine data (modify import based on your setup)
-const { medicines, findSimilarMedicines } = window.MedicineData || { 
-    medicines: [], 
-    findSimilarMedicines: () => [] 
-};
-
-class MedicineGuessingGame {
-    constructor() {
-        // Game state elements
-        this.currentMedicine = null;
-        this.hintIndex = 0;
-        this.timeLeft = 60;
-        this.timerInterval = null;
-
-        // DOM elements
-        this.timerElement = document.getElementById('timer');
-        this.gameBoardElement = document.getElementById('game-board');
-        this.hintAreaElement = document.getElementById('hint-area');
-        this.choicesAreaElement = document.getElementById('choices-area');
-        this.resultElement = document.getElementById('result');
-
-        // Bind methods to maintain context
-        this.startGame = this.startGame.bind(this);
-        this.checkAnswer = this.checkAnswer.bind(this);
-        this.startTimer = this.startTimer.bind(this);
-        this.stopTimer = this.stopTimer.bind(this);
-        this.endGame = this.endGame.bind(this);
-    }
-
-    shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
-    startTimer() {
-        this.timeLeft = 60;
-        this.timerElement.textContent = `เวลา: ${this.timeLeft}`;
-        
-        this.timerInterval = setInterval(() => {
-            this.timeLeft--;
-            this.timerElement.textContent = `เวลา: ${this.timeLeft}`;
-            
-            if (this.timeLeft <= 0) {
-                this.stopTimer();
-                this.endGame(false);
+        const medicines = [
+            {
+                name: "พาราเซตามอล",
+                hints: [
+                    "ใช้ลดไข้และบรรเทาปวด",
+                    "ยาเม็ดสีขาว ขนาด 500 มก.",
+                    "ไม่ควรทานเกิน 8 เม็ดต่อวัน",
+                    "ควรระวังในผู้ป่วยโรคตับ",
+                    "มักใช้เป็นยาตัวแรกเมื่อมีไข้"
+                ]
+            },
+            {
+                name: "คาลาไมน์",
+                hints: [
+                    "ใช้ทาภายนอกแก้คัน",
+                    "มีลักษณะเป็นโลชั่นสีชมพู",
+                    "นิยมใช้รักษาผดผื่นคัน",
+                    "มีสรรพคุณระงับอาการแพ้",
+                    "ห้ามทาบริเวณที่มีแผลเปิด"
+                ]
+            },
+            {
+                name: "เบตาดีน",
+                hints: [
+                    "ใช้ฆ่าเชื้อโรค",
+                    "มีสีน้ำตาลแดง",
+                    "ใช้ทำความสะอาดบาดแผล",
+                    "มีไอโอดีนเป็นส่วนประกอบ",
+                    "อาจทำให้เสื้อผ้าเปื้อนติดถาวร"
+                ]
+            },
+            {
+                name: "น้ำเกลือล้างแผล",
+                hints: [
+                    "ใช้ทำความสะอาดบาดแผล",
+                    "เป็นสารละลายใส ไม่มีสี",
+                    "มีความเข้มข้น 0.9%",
+                    "ใช้ล้างตาได้",
+                    "ไม่แสบแผล"
+                ]
+            },
+            {
+                name: "ทิงเจอร์ไอโอดีน",
+                hints: [
+                    "ใช้ฆ่าเชื้อโรค",
+                    "มีสีน้ำตาลเข้ม",
+                    "ระคายเคืองผิวหนังได้",
+                    "ใช้ทาก่อนฉีดยา",
+                    "ห้ามรับประทาน"
+                ]
+            },
+            {
+                name: "ยาธาตุน้ำแดง",
+                hints: [
+                    "ใช้รักษาอาการท้องอืด ท้องเฟ้อ",
+                    "มีสีแดง",
+                    "มีรสหวาน",
+                    "มีสมุนไพรเป็นส่วนประกอบ",
+                    "นิยมใช้หลังอาหาร"
+                ]
+            },
+            {
+                name: "ยาแก้แพ้",
+                hints: [
+                    "ใช้บรรเทาอาการแพ้",
+                    "อาจทำให้ง่วงนอน",
+                    "ไม่ควรดื่มแอลกอฮอล์",
+                    "ห้ามใช้ในเด็กอายุต่ำกว่า 6 ปี",
+                    "ระวังการขับขี่ยานพาหนะ"
+                ]
+            },
+            {
+                name: "ผงน้ำตาลเกลือแร่",
+                hints: [
+                    "ใช้รักษาอาการท้องเสีย",
+                    "ละลายน้ำดื่ม",
+                    "ป้องกันการขาดน้ำ",
+                    "มีรสเค็มอ่อนๆ",
+                    "ควรดื่มให้หมดภายใน 24 ชั่วโมง"
+                ]
+            },
+            {
+                name: "วาสลีน",
+                hints: [
+                    "ใช้ทาผิวแห้ง แตก",
+                    "มีลักษณะเป็นขี้ผึ้ง",
+                    "ไม่มีสี โปร่งใส",
+                    "ใช้ปกป้องผิวจากความชื้น",
+                    "ไม่มีส่วนผสมของน้ำ"
+                ]
+            },
+            {
+                name: "แอลกอฮอล์",
+                hints: [
+                    "ใช้ฆ่าเชื้อโรค",
+                    "ระเหยง่าย",
+                    "ห้ามใช้กับแผลเปิด",
+                    "เก็บให้ห่างจากเปลวไฟ",
+                    "มีความเข้มข้น 70%"
+                ]
             }
-        }, 1000);
-    }
+        ];
 
-    stopTimer() {
-        if (this.timerInterval) {
-            clearInterval(this.timerInterval);
-        }
-    }
+        let currentMedicine = null;
+        let hintIndex = 0;
+        let revealedHints = [];
+        let score = 0;
+        let timeLeft = 120; // 2 minutes in seconds
+        let timer = null;
 
-    endGame(isWin) {
-        this.stopTimer();
-        
-        if (isWin) {
-            this.resultElement.textContent = "ยินดีด้วย! คุณชนะ!";
-            this.resultElement.style.color = "#4CAF50";
-        } else {
-            this.resultElement.textContent = `หมดเวลา! คำตอบที่ถูกต้องคือ: ${this.currentMedicine.name}`;
-            this.resultElement.style.color = "#f44336";
-        }
-
-        // Disable all choice buttons
-        const choiceBtns = document.querySelectorAll('.choice-btn');
-        choiceBtns.forEach(btn => btn.disabled = true);
-
-        // Prompt to restart game
-        setTimeout(() => {
-            if (confirm("ต้องการเล่นอีกครั้งไหม?")) {
-                this.startGame();
-            }
-        }, 1500);
-    }
-
-    createHintTiles() {
-        // Clear previous tiles
-        this.gameBoardElement.innerHTML = '';
-
-        // Create hint tiles
-        for (let i = 0; i < this.currentMedicine.hints.length; i++) {
-            const tile = document.createElement('div');
-            tile.classList.add('hint-tile');
-            tile.textContent = '?';
-            tile.dataset.index = i;
-            this.gameBoardElement.appendChild(tile);
-        }
-    }
-
-    generateChoices() {
-        // Clear previous choices
-        this.choicesAreaElement.innerHTML = '';
-
-        // Find similar medicines
-        const similarMedicines = findSimilarMedicines(this.currentMedicine);
-        
-        // Create choices array
-        let choices = similarMedicines.map(med => med.name).slice(0, 3);
-        choices.push(this.currentMedicine.name);
-
-        // Shuffle choices
-        const shuffledChoices = this.shuffleArray(choices);
-
-        // Create choice buttons
-        shuffledChoices.forEach(choice => {
-            const choiceBtn = document.createElement('button');
-            choiceBtn.textContent = choice;
-            choiceBtn.classList.add('choice-btn');
-            choiceBtn.addEventListener('click', () => this.checkAnswer(choice));
-            this.choicesAreaElement.appendChild(choiceBtn);
-        });
-    }
-
-    revealNextHint() {
-        // Get all hint tiles
-        const tiles = this.gameBoardElement.querySelectorAll('.hint-tile');
-        
-        // Reveal next hint
-        if (this.hintIndex < this.currentMedicine.hints.length) {
-            tiles[this.hintIndex].textContent = this.currentMedicine.hints[this.hintIndex];
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
             
-            // Update hint area
-            const hintDiv = document.createElement('div');
-            hintDiv.textContent = `คำใบ้ ${this.hintIndex + 1}: ${this.currentMedicine.hints[this.hintIndex]}`;
-            this.hintAreaElement.appendChild(hintDiv);
-
-            this.hintIndex++;
+            if (timeLeft === 0) {
+                endGame();
+            } else {
+                timeLeft--;
+            }
         }
-    }
 
-    checkAnswer(guess) {
-        // Disable buttons to prevent multiple clicks
-        const choiceBtns = document.querySelectorAll('.choice-btn');
-        choiceBtns.forEach(btn => btn.disabled = true);
+        function startTimer() {
+            if (timer) {
+                clearInterval(timer);
+            }
+            timeLeft = 120;
+            timer = setInterval(updateTimer, 1000);
+        }
 
-        if (guess === this.currentMedicine.name) {
-            // Correct answer
-            this.resultElement.textContent = "ถูกต้อง!";
-            this.resultElement.style.color = "#4CAF50";
+        function endGame() {
+            clearInterval(timer);
+            document.getElementById('result').textContent = `เกมจบแล้ว! คะแนนของคุณคือ ${score} คะแนน`;
+            document.getElementById('reveal-btn').disabled = true;
+            const choices = document.querySelectorAll('.choice-btn');
+            choices.forEach(choice => choice.disabled = true);
+        }
 
-            // Reveal next hint
-            this.revealNextHint();
+        function updateScore() {
+            document.getElementById('score').textContent = `คะแนน: ${score}`;
+        }
 
-            // Check if all hints have been revealed
-            if (this.hintIndex >= this.currentMedicine.hints.length) {
-                this.stopTimer();
-                this.resultElement.textContent = "ยอดเยี่ยม! คุณทายถูกต้อง!";
-                
+        function createChoices() {
+            const choicesContainer = document.getElementById('choices');
+            choicesContainer.innerHTML = '';
+            
+            // สร้างรายการยาทั้งหมดและสลับตำแหน่ง
+            const allMedicines = [...medicines];
+            for (let i = allMedicines.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allMedicines[i], allMedicines[j]] = [allMedicines[j], allMedicines[i]];
+            }
+
+            // แสดงตัวเลือกทั้งหมด
+            allMedicines.forEach(medicine => {
+                const button = document.createElement('button');
+                button.className = 'choice-btn';
+                button.textContent = medicine.name;
+                button.addEventListener('click', () => checkAnswer(medicine.name, button));
+                choicesContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(guess, button) {
+            const allButtons = document.querySelectorAll('.choice-btn');
+            allButtons.forEach(btn => btn.disabled = true);
+
+            if (guess === currentMedicine.name) {
+                button.classList.add('correct');
+                document.getElementById('result').textContent = "ถูกต้อง! คุณเก่งมาก!";
+                score += Math.max(5 - hintIndex, 1); // คะแนนลดลงตามจำนวนคำใบ้ที่เปิด
+                updateScore();
                 setTimeout(() => {
-                    if (confirm("ต้องการเล่นอีกครั้งไหม?")) {
-                        this.startGame();
-                    }
+                    startGame();
                 }, 1500);
-                return;
+            } else {
+                button.classList.add('wrong');
+                document.getElementById('result').textContent = "ผิด! ลองอีกครั้ง";
+                setTimeout(() => {
+                    button.classList.remove('wrong');
+                    allButtons.forEach(btn => btn.disabled = false);
+                }, 1000);
             }
-
-            // Regenerate choices for next round
-            this.generateChoices();
-        } else {
-            // Incorrect answer
-            this.resultElement.textContent = "ผิด! ลองอีกครั้ง";
-            this.resultElement.style.color = "#f44336";
-
-            // Find and highlight the incorrect button
-            choiceBtns.forEach(btn => {
-                if (btn.textContent === guess) {
-                    btn.classList.add('incorrect');
-                }
-            });
         }
 
-        // Re-enable buttons after a short delay
-        setTimeout(() => {
-            choiceBtns.forEach(btn => {
-                btn.disabled = false;
-                btn.classList.remove('incorrect');
-            });
-        }, 1000);
-    }
+        function startGame() {
+            const randomIndex = Math.floor(Math.random() * medicines.length);
+            currentMedicine = medicines[randomIndex];
+            hintIndex = 0;
+            revealedHints = [];
+            document.getElementById('hint-area').textContent = '';
+            document.getElementById('result').textContent = '';
+            document.getElementById('game-board').innerHTML = '';
+            
+            for (let i = 0; i < currentMedicine.hints.length; i++) {
+                const tile = document.createElement('div');
+                tile.textContent = '?';
+                tile.dataset.index = i;
+                document.getElementById('game-board').appendChild(tile);
+            }
+            createChoices();
+        }
 
-    startGame() {
-        // Reset game state
-        this.hintIndex = 0;
-        this.hintAreaElement.innerHTML = '';
-        this.resultElement.textContent = '';
+        document.getElementById('reveal-btn').addEventListener('click', () => {
+            if (hintIndex < currentMedicine.hints.length) {
+                const tiles = document.querySelectorAll('#game-board div');
+                tiles[hintIndex].textContent = currentMedicine.hints[hintIndex];
+                revealedHints.push(currentMedicine.hints[hintIndex]);
+                document.getElementById('hint-area').innerHTML = revealedHints.map(
+                    (hint, index) => `<div>คำใบ้ ${index + 1}: ${hint}</div>`
+                ).join('');
+                hintIndex++;
+            } else {
+                document.getElementById('hint-area').textContent = "หมดคำใบ้แล้ว!";
+            }
+        });
 
-        // Select a random medicine
-        this.currentMedicine = medicines[Math.floor(Math.random() * medicines.length)];
-
-        // Create hint tiles
-        this.createHintTiles();
-
-        // Reveal first hint
-        this.revealNextHint();
-
-        // Generate initial choices
-        this.generateChoices();
-
-        // Start the timer
-        this.startTimer();
-    }
-
-    // Initialize the game when the script loads
-    init() {
-        // Start the game when the page loads
-        window.addEventListener('load', this.startGame);
-    }
-}
-
-// Create and initialize the game
-const game = new MedicineGuessingGame();
-game.init();
-
-// Optional: Export for potential module use
-export default MedicineGuessingGame;
+        // เริ่มเกมครั้งแรก
+        startGame();
+        startTimer();
     </script>
 </body>
 </html>
